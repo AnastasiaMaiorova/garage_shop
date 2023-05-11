@@ -14,9 +14,11 @@ def get_product_urls(object, vuewname):
 
 # Пользователь
 class Customer(models.Model):
+    # settings.AUTH_USER_MODEL - стандартная модель Django
     user = models.OneToOneField(settings.AUTH_USER_MODEL, verbose_name='Пользователь', on_delete=models.CASCADE),
     is_active = models.BooleanField(default=True, verbose_name='Активность пользователя'),
     customer_orders = models.ManyToManyField('Order', blank=True, verbose_name='Заказы покупателя', related_name='related_customer')
+    # wishlist - лист ожидания
     wishlist = models.ManyToManyField('Product', blank=True, verbose_name='Список ожидаемого')
     phone = models.CharField(max_length=20, verbose_name='Номер телефона')
     address = models.TextField(null=True, blank=True, verbose_name='Адрес')
@@ -109,7 +111,7 @@ class ProductCart(models.Model):
     def __str__(self):
         return self.content_object.name
 
-    # Функция для подсчета итоговой цены
+    # Функция для подсчета итоговой цены (количество на цену)
     def save(self, *args, **kwargs):
         self.final_price = self.quantity * self.content_object.price
         # return self.final_price - зациклился
@@ -181,7 +183,7 @@ class Order(models.Model):
     last_name = models.CharField(max_length=255, verbose_name='Фамилия')
     phone = models.CharField(max_length=20, verbose_name='Телефон')
     cart = models.ForeignKey(Cart, verbose_name='Корзина', null=True, blank=True, on_delete=models.CASCADE)
-    address = models.CharField(max_length=1024, verbose_name='Адрес', null=True, blank=True)
+    address = models.CharField(max_length=1024, verbose_name='Адрес', null=True, blank=True)# null=True, blank=True - может быть пустой строкой
     status = models.CharField(max_length=100, verbose_name='Статус заказа', choices=STATUS_CHOICES, default=STATUS_NEW)
     buying_type = models.CharField(max_length=100, verbose_name='Тип заказа', choices=BUYING_TYPE_CHOICES)
     comment = models.TextField(verbose_name='Комментарий к заказу', null=True, blank=True)
@@ -194,3 +196,20 @@ class Order(models.Model):
     class Meta:
         verbose_name = 'Заказ'
         verbose_name_plural = 'Заказы'
+
+
+# Уведомления
+class Notification(models.Model):
+    guest = models.ForeignKey(Customer, verbose_name='Пользователь', on_delete=models.CASCADE)
+    # текст сообщения
+    text = models.TextField(verbose_name='Текст сообщения')
+    # прочитан ли текст, по default будет стоять что нет
+    read_me = models.BooleanField(default=False)
+
+    def __str__(self):
+        return 'Уведомление для {}'.format(self.guest.user.first_name)
+
+    class Meta:
+        verbose_name = 'Уведомление'
+        verbose_name_plural = 'Уведомления'
+
