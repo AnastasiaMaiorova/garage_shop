@@ -1,5 +1,16 @@
 from django.db import models
 from django.conf import settings
+from django.urls import reverse
+from django.utils import timezone
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+
+# данная функция нужна для ссылки /.../.../ content_type_model
+def get_product_urls(object, vuewname):
+   ct_model = object.__class__.meta.model.name
+   return reverse(vuewname, kwargs={'ct_model': ct_model,
+                                    'ssylka': object.slug})
+
 
 # Пользователь
 class Customer(models.Model):
@@ -60,6 +71,9 @@ class Oil(Product):
     def __str__(self):
         return "{} {}".format(self.category.name, self.name_product)
 
+    def get_absolut_url(self):
+        return get_product_urls(self, 'product_detail')
+
     class Meta:
         verbose_name = 'Масло'
         verbose_name_plural = 'Масла'
@@ -72,8 +86,60 @@ class Filter(Product):
     def __str__(self):
         return "{} {}".format(self.category.name, self.name_product)
 
+    def get_absolut_url(self):
+        return get_product_urls(self, 'product_detail')
+
     class Meta:
         verbose_name = 'Фильтр'
         verbose_name_plural = 'Фильтра'
 
+# Промежуточный продукт для корзины
+class ProductCart(models.Model):
+    guest = models.ForeignKey(Customer, verbose_name='Пользователь', on_delete=models.CASCADE)
+    cart = models.ForeignKey('Cart', verbose_name='Корзина', on_delete=models.CASCADE)
+    # Content Types сохраняет информацию о моделях в таблицу contenttypes, а именно: название приложения, название модели и тип.
+    # Таким образом мы можем создать GenericForeignKey на любую модель используя всего одно поле.
+    # content_type, content_id, content_object - для расширения не только товаров, но и услуг
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    content_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'content_id')
+    quantity = models.PositiveIntegerField(default=1)# Количество
+    final_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена")# max_digits=10 - максимальная длина числа до запятой, decimal_places=2 - количесво чисел после запятой
 
+    def __str__(self):
+        return self.content_object.name
+
+    # Функция для подсчета итоговой цены
+    def save(self, *args, **kwargs):
+        self.final_price = self.quantity * self.content_object.price
+        # return self.final_price - зациклился
+        super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = 'Продукт для корзины'
+        verbose_name_plural = 'Продукты для корзины'
+
+
+# Корзина
+class Cart(models.Model):
+    guest = models.ForeignKey(Customer, verbose_name='Пользователь', on_delete=models.CASCADE)
+    products = models.ManyToManyField(ProductCart, blank=True, related_name='related_cart', verbose_name='Продукты')# blank=True определяет, будет ли поле обязательным в формах. Сюда входят администраторские и ваши собственные пользовательские формы.
+    product_quantity = models.IntegerField(default=8, verbose_name='Итоговое количество товара')
+    final_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена")  # max_digits=10 - максимальная длина числа до запятой, decimal_places=2 - количесво чисел после запятой
+    # является ли данная корзина какого либо товара
+    order_in = models.BooleanField(default=False)
+    # данное значения для пользователя который был не зарегистрирован
+    user_anonym = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.products
+
+    # Функция для подсчета суммы
+    def product_sum(self):
+        return [product.content_object for product in self.products.all()]
+
+    # total_price = sum(book.price for book in Book.objects.all())
+
+    class Meta:
+        verbose_name = 'Корзина'
+        verbose_name_plural = 'Корзины'
