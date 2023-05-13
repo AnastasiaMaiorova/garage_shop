@@ -1,0 +1,21 @@
+
+{% extends 'shop/index.html' %}
+
+
+{% block content %}
+
+
+    <div class="register" style="margin-bottom: 20px;">
+        <h1 class="text-center-register">Регистрация</h1>
+        <div class="content-register">
+            <form action="{% url 'register' %}" method="POST">
+                {{ form.as_p }}
+                {% csrf_token %}
+
+                <input type="submit" class="btn btn-success btn-block" value="Зарегистрироваться">
+            </form>
+        </div>
+
+    </div>
+
+{% endblock %}

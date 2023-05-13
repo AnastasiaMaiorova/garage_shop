@@ -1,0 +1,16 @@
+{% extends 'shop/index.html' %}
+{% block content %}
+
+    <div class="login" style="margin-bottom: 20px;">
+        <h1 class="text-center-login">Авторизация</h1>
+        <div class="content-login">
+            <form action="{% url 'login' %}" method="POST">
+                {{ form.as_p }}
+                {% csrf_token %}
+                <input type="submit" class="btn btn-success btn-block" value="Войти">
+            </form>
+        </div>
+
+    </div>
+
+{% endblock %}
