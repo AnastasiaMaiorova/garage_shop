@@ -52,6 +52,10 @@ body {
   margin-left: 30px;
 }
 
+.header-logo > a {
+  text-decoration: none;
+}
+
 .cart {
   float: right;
   padding: 15px 0px;
@@ -97,6 +101,21 @@ body {
   border-bottom: 2px solid #E4E7ED;
 
 }
+
+/* 4 контейнер динамическая главная страница info_shop*/
+.info_shop {
+  margin: 20px;
+}
+
+.info_shop > h3 {
+  text-align: center;
+  font-style: italic;
+}
+.info_shop > p {
+  text-align: justify;
+  text-indent: 40px;
+}
+
 
 /* 4 контейнер динамическая регистрация register*/
 .register {

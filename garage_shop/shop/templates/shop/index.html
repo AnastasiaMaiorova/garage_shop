@@ -33,7 +33,9 @@
                         <!-- Логотип компании col-md-3-->
                         <div class="d-inline-block">
                             <div class="header-logo">
-                                <p class="fs-1 fst-italic" style="color: #ffffff">ГАРАЖ</p> <!-- сюда можно поставить картинку <img src="путь до картинки" alt="" вместо h1-->
+                                <a href="{% url 'info_shop' %}">
+                                    <p class="fs-1 fst-italic" style="color: #ffffff">ГАРАЖ</p> <!-- сюда можно поставить картинку <img src="путь до картинки" alt="" вместо h1-->
+                                </a>
                             </div>
                         </div>
 
@@ -55,7 +57,7 @@
 			<div class="container">
 				<div id="responsive-nav">
 					<ul class="main-nav nav navbar-nav">
-						<li class="active"><a href="{% url 'shop' %}">Главная страница</a></li>
+						<li class="active"><a href="{% url 'info_shop' %}">Главная страница</a></li>
 						<li><a href="">О компании</a></li>
 						<li><a href="">Магазин</a></li>
 						<li><a href="">Сервис</a></li>
@@ -96,7 +98,7 @@
 									<a href="https://www.youtube.com"><i class="fa-brands fa-youtube"></i></a>
 								</li>
                                 <li>
-                                    <a href="https://github.com/Amastasiya/garaz_shop"><i class="fa-brands fa-github"></i></a>
+                                    <a href="https://github.com/AnastasiaMaiorova/garage_shop"><i class="fa-brands fa-github"></i></a>
                                 </li>
 							</ul>
 						</div>
