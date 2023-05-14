@@ -1,25 +1,30 @@
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django import views
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login
-from .forms import LoginForm, RegistrationForm
-from .models import Customer
+from .forms import LoginForm, RegistrationForm, UserEditForm, CustomerEditForm
 from .models import Oil, Filter, Customer, Product, Category
 from django.views.generic import DetailView, View
 
 
-def index(request):
+def index(self, request):
     # categories = Category.objects.get_caterories_for_left_sedebar()
-    # context = {
-    #     'products': products,
-    # }
+
+    context = {
+        'notifications': self.notifications(request.user)
+    }
+
     return render(
         request,
         'shop/index.html',
+        context
     )
+
 
 def info_shop(request):
     return render(request, 'shop/info_shop.html', {})
+
 
 class ProductDetailView(DetailView):
 
@@ -27,6 +32,7 @@ class ProductDetailView(DetailView):
         'oil': Oil,
         'filter': Filter
     }
+
     # встроенная функция во view
     def dispatch(self, request, *args, **kwargs):
         self.model = self.CT_MODEL_MODEL_CLASS[kwargs['ct_model']]
@@ -37,6 +43,8 @@ class ProductDetailView(DetailView):
     context_object_name = 'product'
     template_name = 'shop/product_detail.html'
     slug_url_kwarg = 'slug'
+
+
 
 def user_login(request):
     if request.method == 'POST':
@@ -56,6 +64,7 @@ def user_login(request):
         form = LoginForm()
     return render(request, 'shop/login.html', {'form': form})
 
+
 def register(request):
     if request.method == 'POST':
         user_form = RegistrationForm(request.POST)
@@ -71,7 +80,7 @@ def register(request):
             # Save the User object
             new_user.save()
             # profile = Profile.objects.create(user=new_user)
-            Customer.objects.create(user=new_user,
+            profile = Customer.objects.create(user=new_user,
                                     phone=user_form.cleaned_data['phone'],
                                     address=user_form.cleaned_data['address'])
             # !!! new_user или user !!!
@@ -82,4 +91,22 @@ def register(request):
     else:
         user_form = RegistrationForm()
     return render(request, 'shop/register.html', {'form': user_form})
+
+
+@login_required
+def account(request):
+    if request.method == 'POST':
+        user_form = UserEditForm(instance=request.user, data=request.POST)
+        profile_form = CustomerEditForm(instance=request.user.profile, data=request.POST, files=request.FILES)
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+    else:
+        user_form = UserEditForm(instance=request.user)
+        profile_form = CustomerEditForm(instance=request.user.profile)
+        return render(request,
+                      'shop/account.html',
+                      {'user_form': user_form,
+                       'profile_form': profile_form})
+
 

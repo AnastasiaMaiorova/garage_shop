@@ -9,6 +9,8 @@ urlpatterns = [
     path('login/', views.user_login, name='login'),
     path('register/', views.register, name='register'),
     # главная страница
-    path('mainpage', views.info_shop, name='info_shop'),
+    path('mainpage/', views.info_shop, name='info_shop'),
+    path('account/', views.account, name='account'),
+    # path('logout/', 'views.logout', name='logout')
 
 ]

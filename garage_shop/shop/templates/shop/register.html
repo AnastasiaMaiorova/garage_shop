@@ -1,8 +1,14 @@
-
 {% extends 'shop/index.html' %}
-
-
+{% block title %}Гараж - регистрация{% endblock %}
 {% block content %}
+    {% if form.errors %}
+        <p>
+            Ваше email и пароль не совпадают.
+            Пожалуйста, попробуйте еще раз.
+        </p>
+    {% else %}
+        <p>Пожалуйста, используйте следующую форму для регистрации:</p>
+    {% endif %}
 
 
     <div class="register" style="margin-bottom: 20px;">
@@ -11,9 +17,14 @@
             <form action="{% url 'register' %}" method="POST">
                 {{ form.as_p }}
                 {% csrf_token %}
+                <input type="hidden", name="next" value="{{ next }}/">
+                <p><input type="submit" class="btn btn-success btn-block" value="Зарегистрироваться"></p>
 
-                <input type="submit" class="btn btn-success btn-block" value="Зарегистрироваться">
+
             </form>
+
+                <!--<input type="submit" class="btn btn-success btn-block" value="Зарегистрироваться">
+            </form>-->
         </div>
 
     </div>

@@ -181,6 +181,38 @@ body {
 
 }
 
+/* 4 контейнер динамическая авторизация product_detail.html*/
+.products {
+  display: flex;
+  margin-left: 20px;
+}
+
+.products_image {
+  width: 20%;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.products_descriprion {
+  width: 50%;
+  margin-left: 20px;
+}
+
+.products_descriprion p {
+  line-height: 1.5;
+  text-align:justify;
+}
+
+#add_to_cart_1 {
+  width: 20%;
+  margin-top: 30px;
+  padding-left: 10px;
+  width: 300px;
+  height: 30px;
+  margin-right: -4px;
+  border-radius: 40px;
+}
+
 
 /* 5 контейнер */
 #newsletter.section3 {
