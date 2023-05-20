@@ -1,27 +1,30 @@
 from django import forms
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 
-User = get_user_model()
+from .models import Customer
 
-class LoginForm(forms.ModelForm):
 
+class LoginForm(forms.Form):
+
+    username = forms.CharField(required=True)
     password = forms.CharField(widget=forms.PasswordInput)
 
     class Meta:
         model = User
-        fields = ['email', 'password']
+        fields = ['username', 'password']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['email'].label = 'Email'
+        self.fields['username'].label = 'Логин'
         self.fields['password'].label = 'Пароль'
 
     def clean(self):
-        email = self.cleaned_data['email']
+        username = self.cleaned_data['username']
         password = self.cleaned_data['password']
-        user = User.objects.filter(email=email).first()
+        print(User.objects.filter(username=username), username)
+        user = User.objects.filter(username=username).first()
         if not user:
-            raise forms.ValidationError('Пользователь с данным Email не найден в системе')
+            raise forms.ValidationError('Пользователь с данным Логином не найден в системе')
         if not user.check_password(password):
             raise forms.ValidationError('Неверный пароль')
         return self.cleaned_data
@@ -29,14 +32,18 @@ class LoginForm(forms.ModelForm):
 
 class RegistrationForm(forms.ModelForm):
 
+    username = forms.CharField(required=True)
     confirm_password = forms.CharField(widget=forms.PasswordInput)
     password = forms.CharField(widget=forms.PasswordInput)
     phone = forms.CharField(required=False)
     address = forms.CharField(required=False)
     email = forms.EmailField()
+    first_name = forms.CharField()
+    last_name = forms.CharField()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['username'].label = 'Логин'
         self.fields['password'].label = 'Пароль'
         self.fields['confirm_password'].label = 'Подтвердите пароль'
         self.fields['phone'].label = 'Номер телефона'
@@ -49,10 +56,18 @@ class RegistrationForm(forms.ModelForm):
         email = self.cleaned_data['email']
         domain = email.split('.')[-1]
         if domain in ['net', 'xyz']:
-            raise forms.ValidationError('Регистрация для данного домена невозможна') # 'Регистрация для домена {} невозможна'.format(self.domain)
+            # 'Регистрация для домена {} невозможна'.format(self.domain)
+            raise forms.ValidationError('Регистрация для данного домена невозможна')
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError('Данный почтовый адрес уже зарегистрирован')
         return email
+
+    def clean_username(self):
+        username = self.cleaned_data['username']
+        users = User.objects.filter(username=username)
+        if len(users) != 0:
+            raise forms.ValidationError('Данный логин уже зарегистрирован')
+        return username
 
     def clean(self):
         password = self.cleaned_data['password']
@@ -63,4 +78,95 @@ class RegistrationForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['email', 'password', 'confirm_password', 'first_name', 'last_name', 'address', 'phone']
+        fields = ['username', 'password', 'confirm_password', 'first_name', 'last_name', 'address', 'phone', 'email']
+
+
+
+# НАЧАЛО ВАЖНО
+# class LoginForm(forms.ModelForm):
+#
+#     username = forms.CharField(required=True)
+#     password = forms.CharField(widget=forms.PasswordInput)
+#
+#     class Meta:
+#         model = Customer
+#         fields = ['username', 'password']
+#
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         self.fields['username'].label = 'Логин'
+#         self.fields['password'].label = 'Пароль'
+#
+#     def clean(self):
+#         username = self.cleaned_data['username']
+#         password = self.cleaned_data['password']
+#         print(Customer.objects.filter(username=username), username)
+#         user = Customer.objects.filter(username=username).first()
+#         if not user:
+#             raise forms.ValidationError('Пользователь с данным Логином не найден в системе')
+#         if not user.check_password(password):
+#             raise forms.ValidationError('Неверный пароль')
+#         return self.cleaned_data
+#
+#
+# class RegistrationForm(forms.ModelForm):
+#
+#     username = forms.CharField(required=True)
+#     confirm_password = forms.CharField(widget=forms.PasswordInput)
+#     password = forms.CharField(widget=forms.PasswordInput)
+#     phone = forms.CharField(required=False)
+#     address = forms.CharField(required=False)
+#     email = forms.EmailField()
+#     first_name = forms.CharField()
+#     last_name = forms.CharField()
+#
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         self.fields['username'].label = 'Логин'
+#         self.fields['password'].label = 'Пароль'
+#         self.fields['confirm_password'].label = 'Подтвердите пароль'
+#         self.fields['phone'].label = 'Номер телефона'
+#         self.fields['address'].label = 'Адрес'
+#         self.fields['email'].label = 'Почта'
+#         self.fields['first_name'].label = 'Имя'
+#         self.fields['last_name'].label = 'Фамилия'
+#
+#     def clean_email(self):
+#         email = self.cleaned_data['email']
+#         domain = email.split('.')[-1]
+#         if domain in ['net', 'xyz']:
+#             # 'Регистрация для домена {} невозможна'.format(self.domain)
+#             raise forms.ValidationError('Регистрация для данного домена невозможна')
+#         if Customer.objects.filter(email=email).exists():
+#             raise forms.ValidationError('Данный почтовый адрес уже зарегистрирован')
+#         return email
+#
+#     def clean_username(self):
+#         username = self.cleaned_data['username']
+#         users = Customer.objects.filter(username=username)
+#         if len(users) != 0:
+#             raise forms.ValidationError('Данный логин уже зарегистрирован')
+#         return username
+#
+#     def clean(self):
+#         password = self.cleaned_data['password']
+#         confirm_password = self.cleaned_data['confirm_password']
+#         if password != confirm_password:
+#             raise forms.ValidationError('Пароли не совпадают')
+#         return self.cleaned_data
+#
+#     class Meta:
+#         model = Customer
+#         fields = ['username', 'email', 'password', 'confirm_password', 'first_name', 'last_name', 'address', 'phone']
+# КОНЕЦ ВАЖНО
+
+# class UserEditForm(forms.ModelForm):
+#     class Meta:
+#         model = Customer
+#         fields = ['first_name', 'last_name', 'email']
+#
+#
+# class CustomerEditForm(forms.ModelForm):
+#     class Meta:
+#         moder = Customer
+#         fields = ('address', 'phone')

@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 from django.urls import reverse
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -39,8 +40,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'shop'
+    'shop',
+    # 'garage_shop'
 ]
+
+# AUTH_USER_MODEL = 'shop.Customer'
+# CART_SESSION_ID = 'shop'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

@@ -11,7 +11,7 @@
     <p>Описание: <br> {{ product.description }}</p>
   </div>
   <div class="button_cart">
-    <a href=""><button class="btn btn-dagner" id="add_to_cart_1">Добавить в корзину</button></a>
+    <a href="{% url 'add_to_cart' ct_model=ct_model slug=product.slug %}"><button class="btn btn-dagner" id="add_to_cart_1">Добавить в корзину</button></a>
   </div>
 
 </div>

@@ -1,5 +1,5 @@
 {% load static %}
-<form action="{% url 'shop' %}" method="post">
+<!--<form action="{% url 'shop' %}" method="post">-->
     {% csrf_token %}
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
@@ -19,12 +19,13 @@
                 </ul>
 
                 <ul class="header-links pull-right">
-
-                    <li class="nav-item"><a class="nav-link" href="{% url 'login' %}"><img src=""><i class="fa fa-user-o"></i> Авторизация</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'register' %}"><img src=""><i class="fa fa-user-o"></i> Регистрация</a></li>
-
-                    <li class="nav-item"><a class="nav-link" href=""><img src=""><i class="fa fa-user-o"></i> Личный кабинет</a></li>
-                    <li class="nav-item"><a class="nav-link" href=""><img src=""><i class="fa fa-user-o"></i> Выйти</a></li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item"><a class="nav-link" href=""><img src=""><i class="fa fa-user-o"></i> Личный кабинет</a></li>
+                        <li class="nav-item"><a class="nav-link" href=""><img src=""><i class="fa fa-user-o"></i> Выйти</a></li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}"><img src=""><i class="fa fa-user-o"></i> Авторизация</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'register' %}"><img src=""><i class="fa fa-user-o"></i> Регистрация</a></li>
+                    {% endif %}
                 </ul>
             </div>
 
@@ -44,7 +45,7 @@
                         <!-- Корзина -->
                         <div class="col-15">
                             <div class="cart">
-                                <a class="fs-5" href=""><i class="fa fa-shopping-cart" style="color: #ffffff;"> Корзина</i></a>
+                                <a class="fs-5" href="{% url 'cart' %}"><i class="fa fa-shopping-cart" style="color: #ffffff;"> Корзина</i></a>
                             </div>
                         </div>
                     </div>
@@ -61,7 +62,7 @@
 					<ul class="main-nav nav navbar-nav">
 						<li class="active"><a href="{% url 'info_shop' %}">Главная страница</a></li>
 						<li><a href="">О компании</a></li>
-						<li><a href="">Магазин</a></li>
+						<li><a href="{% url 'product' %}">Магазин</a></li>
 						<li><a href="">Сервис</a></li>
 						<li><a href="">Доставка</a></li>
 						<li><a href="">Контакты</a></li>
@@ -168,6 +169,6 @@
 
     </body>
 
-</form>
+<!--</form>-->
 <!-- для электронных иконок -->
 <script src="https://kit.fontawesome.com/35154ce603.js" crossorigin="anonymous"></script>

@@ -7,7 +7,7 @@
             Пожалуйста, попробуйте еще раз.
         </p>
     {% else %}
-        <p>Пожалуйста, используйте следующую форму для регистрации:</p>
+        <p>Пожалуйста, используйте следующую форму для авторизации:</p>
     {% endif %}
 
     <div class="login" style="margin-bottom: 20px;">
@@ -16,7 +16,7 @@
             <form action="{% url 'login' %}" method="POST">
                 {{ form.as_p }}
                 {% csrf_token %}
-                <input type="hidden" name="next" value="{% url 'info_shop' %}"/>
+                {% comment %} <input type="hidden" name="next" value="{% url 'info_shop' %}"/> {% endcomment %}
                 <p><input type="submit" class="btn btn-success btn-block" value="Войти"></p>
             </form>
         </div>
