@@ -100,12 +100,36 @@ body {
 .section {
   background: #FBFBFC;
   border-bottom: 2px solid #E4E7ED;
+}
 
+.row2{
+  display: flex;
+}
+
+#left_text{
+  margin-left: 40px;
+}
+
+
+
+
+/* 4 контейнер динамическая главная страница вывод категории*/
+
+.category_product{
+  width: 180px;
+  margin-right: 20px;
+}
+
+.category_product a {
+  color: black;
+  text-decoration: none;
+  padding-top: 20px;
 }
 
 /* 4 контейнер динамическая главная страница info_shop*/
 .info_shop {
-  margin: 20px;
+
+  margin-right: 30px;
 }
 
 .info_shop > h3 {
@@ -182,6 +206,54 @@ body {
 
 }
 
+/* 4 контейнер динамическая авторизация account.html*/
+.conteiner_account{
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.account_user {
+  width: 500px;
+}
+
+.errorlist {
+  color: #FBFBFC;
+}
+
+/* 4 контейнер динамическая авторизация product.html*/
+.block_product {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.category_img {
+  margin: 30px;
+}
+
+.category_img a {
+  color: black;
+  text-decoration: none;
+}
+
+.category_img h3 {
+  color: black;
+  text-decoration: none;
+}
+/* 4 контейнер динамическая авторизация category_detail.html*/
+.catalog2 {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.img-product{
+  margin: 30px;
+}
+
+.img-product a {
+  color: black;
+  text-decoration: none;
+}
+
 /* 4 контейнер динамическая авторизация product_detail.html*/
 .products {
   display: flex;
@@ -195,13 +267,21 @@ body {
 }
 
 .products_descriprion {
-  width: 50%;
+  width: 80%;
   margin-left: 20px;
 }
 
 .products_descriprion p {
   line-height: 1.5;
   text-align:justify;
+}
+
+.img_and_button_cart{
+  margin: 20px;
+}
+
+.img_and_button_cart img{
+  margin-left: 40px;
 }
 
 #add_to_cart_1 {

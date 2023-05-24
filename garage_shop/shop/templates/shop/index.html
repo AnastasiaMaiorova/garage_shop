@@ -20,8 +20,8 @@
 
                 <ul class="header-links pull-right">
                     {% if user.is_authenticated %}
-                        <li class="nav-item"><a class="nav-link" href=""><img src=""><i class="fa fa-user-o"></i> Личный кабинет</a></li>
-                        <li class="nav-item"><a class="nav-link" href=""><img src=""><i class="fa fa-user-o"></i> Выйти</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'account' %}"><img src=""><i class="fa fa-user-o"></i> Личный кабинет</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}"><img src=""><i class="fa fa-user-o"></i> Выйти</a></li>
                     {% else %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'login' %}"><img src=""><i class="fa fa-user-o"></i> Авторизация</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'register' %}"><img src=""><i class="fa fa-user-o"></i> Регистрация</a></li>
@@ -61,7 +61,7 @@
 				<div id="responsive-nav">
 					<ul class="main-nav nav navbar-nav">
 						<li class="active"><a href="{% url 'info_shop' %}">Главная страница</a></li>
-						<li><a href="">О компании</a></li>
+						<li><a href="{% url 'about_compony' %}">О компании</a></li>
 						<li><a href="{% url 'product' %}">Магазин</a></li>
 						<li><a href="">Сервис</a></li>
 						<li><a href="">Доставка</a></li>
@@ -74,8 +74,17 @@
         <div class="section">
 			<div class="container">
 				<div class="row2">
-                    {% block content %}
-                    {% endblock %}
+                    <div id="left_text">
+                        {% for category in categories %}
+                        <div class="category_product" style="padding-top: 20px;">
+                            <a href="{{ category.get_absolute_url }}" class="list-group">{{ category.name }}</a></li>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="rigth_text">
+                        {% block content %}
+                        {% endblock %}
+                    </div>
 				</div>
 			</div>
 		</div>
@@ -140,8 +149,8 @@
                             <ul class="footer-links">
                                 <li><a href="#">Оплата и доставка</a></li>
                                 <li><a href="#">Наши магазины</a></li>
-                                <li><a href="">Личный кабинет</a></li>
-                                <li><a href="#">Корзина</a></li>
+                                <li><a href="{% url 'account' %}">Личный кабинет</a></li>
+                                <li><a href="{% url 'cart' %}">Корзина</a></li>
                                 <li><a href="#">Документы</a></li>
                             </ul>
                         </div>

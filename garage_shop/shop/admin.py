@@ -2,7 +2,11 @@ from django.contrib import admin
 from .models import *
 
 
-admin.site.register(Customer)
+class CustomerAdmin(admin.ModelAdmin):
+    list_display = ['username', 'last_name', 'first_name', 'email', 'phone', 'address']
+
+
+admin.site.register(Customer, CustomerAdmin)
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -26,7 +30,12 @@ class FilterAdmin(admin.ModelAdmin):
     # list_filter = ['available', 'created', 'updated']
 
 
-admin.site.register(Filter)
+@admin.register(Contact)
+class ContactAdmin(admin.ModelAdmin):
+    list_display = ['email', 'date']
+
+
+admin.site.register(Filter, FilterAdmin)
 admin.site.register(ProductCart)
 admin.site.register(Cart)
 admin.site.register(Order)

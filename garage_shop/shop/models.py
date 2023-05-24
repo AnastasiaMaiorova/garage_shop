@@ -11,9 +11,9 @@ from django.contrib.contenttypes.models import ContentType
 # User = get_user_model()
 
 
-# def get_models_for_count(*model_names):
-#     return [models.Count(model_name) for model_name in model_names]
-
+def get_models_for_count(*model_names):
+    return [models.Count(model_name) for model_name in model_names]
+#
 
 # данная функция нужна для ссылки /.../.../ content_type_model для нахождения товара
 def get_product_urls(object, viewname):
@@ -27,24 +27,24 @@ def get_product_urls(object, viewname):
                                     'slug': object.slug})
 
 
-# class CategoryManager(models.Manager):
-# # для подсчета продуктов в скобках
-#     CATEGORY_NAME_COUNT_NAME = {
-#         'Масло': 'oil__count',
-#         'Фильтр': 'filter__count'
-#     }
-#
-#     def get_queryset(self):
-#         return super().get_queryset()
-#     # для иконок слева масла, фильтра
-#     def get_categories_for_left_sidebar(self):
-#         models = get_models_for_count('oil', 'filter')
-#         qs = list(self.get_queryset().annotate(*models))
-#         data = [
-#             dict(name=count.name, url=count.get_absolute_url(), count=getattr(count, self.CATEGORY_NAME_COUNT_NAME[c.name]))
-#             for count in qs
-#         ]
-#         return data
+class CategoryManager(models.Manager):
+# для подсчета продуктов в скобках
+    CATEGORY_NAME_COUNT_NAME = {
+        'Моторное масло': 'oil__count',
+        'Салонный фильтр': 'filter__count'
+    }
+
+    def get_queryset(self):
+        return super().get_queryset()
+    # для иконок слева масла, фильтра
+    def get_categories_for_left(self):
+        models = get_models_for_count('oil', 'filter')
+        qs = list(self.get_queryset().annotate(*models))
+        data = [
+            dict(name=count.name, url=count.get_absolute_url(), count=getattr(count, self.CATEGORY_NAME_COUNT_NAME[count.name]))
+            for count in qs
+        ]
+        return data
 
 
 # Пользователь
@@ -52,10 +52,11 @@ class Customer(models.Model):
 
     # settings.AUTH_USER_MODEL - стандартная модель Django
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
+    username = models.CharField(max_length=255, verbose_name='Логин')
     last_name = models.CharField(max_length=255, verbose_name='Имя')
     first_name = models.CharField(max_length=255, verbose_name='Фамилия')
     email = models.EmailField(max_length=255, verbose_name='Почта')
-    phone = models.CharField(max_length=20, verbose_name='Номер телефона')
+    phone = models.CharField(max_length=20, blank=True, verbose_name='Номер телефона')
     address = models.TextField(null=True, blank=True, verbose_name='Адрес')
 
     customer_orders = models.ManyToManyField('Order', blank=True, verbose_name='Заказы покупателя',
@@ -77,7 +78,7 @@ class Category(models.Model):
     name = models.CharField(max_length=255, verbose_name="Категория")
     slug = models.SlugField(unique=True)  # ссылка категории
     image = models.ImageField(upload_to='media', verbose_name="Фотография")
-    # objects = CategoryManager()
+    objects = CategoryManager()
 
     def __str__(self):
         return self.name
@@ -255,6 +256,22 @@ class Order(models.Model):
         verbose_name_plural = 'Заказы'
 
 
+class NotificationManager(models.Manager):
+
+    def get_queryset(self):
+        return super().get_queryset()
+
+    def all(self, recipient):
+        return self.get_queryset().filter(
+            recipient=recipient,
+            read=False
+        )
+
+    def make_all_read(self, recipient):
+        qs = self.get_queryset().filter(recipient=recipient, read=False)
+        qs.update(read=True)
+
+
 # Уведомления
 class Notification(models.Model):
     guest = models.ForeignKey(Customer, verbose_name='Пользователь', on_delete=models.CASCADE)
@@ -262,6 +279,7 @@ class Notification(models.Model):
     text = models.TextField(verbose_name='Текст сообщения')
     # прочитан ли текст, по default будет стоять что нет
     read_me = models.BooleanField(default=False)
+    objects = NotificationManager()
 
     def __str__(self):
         return 'Уведомление для {}'.format(self.guest.user.first_name)
@@ -270,3 +288,15 @@ class Notification(models.Model):
         verbose_name = 'Уведомление'
         verbose_name_plural = 'Уведомления'
 
+
+# Рассылка
+class Contact(models.Model):
+    email = models.EmailField(max_length=255, verbose_name='Почта')
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.email
+
+    class Meta:
+        verbose_name = 'Рассылка'
+        verbose_name_plural = 'Рассылки'

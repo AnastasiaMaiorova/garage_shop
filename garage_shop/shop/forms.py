@@ -1,11 +1,12 @@
+from typing import Any, Dict
 from django import forms
 from django.contrib.auth.models import User
-
+from .models import Contact
+# from snowpenguin.django.recaptcha3.fields import ReCaptchaField
 from .models import Customer
 
 
 class LoginForm(forms.Form):
-
     username = forms.CharField(required=True)
     password = forms.CharField(widget=forms.PasswordInput)
 
@@ -31,10 +32,10 @@ class LoginForm(forms.Form):
 
 
 class RegistrationForm(forms.ModelForm):
-
     username = forms.CharField(required=True)
     confirm_password = forms.CharField(widget=forms.PasswordInput)
     password = forms.CharField(widget=forms.PasswordInput)
+    # required=False - не обязательное поле введа
     phone = forms.CharField(required=False)
     address = forms.CharField(required=False)
     email = forms.EmailField()
@@ -49,8 +50,8 @@ class RegistrationForm(forms.ModelForm):
         self.fields['phone'].label = 'Номер телефона'
         self.fields['address'].label = 'Адрес'
         self.fields['email'].label = 'Почта'
-        self.fields['first_name'].label = 'Имя'
-        self.fields['last_name'].label = 'Фамилия'
+        self.fields['first_name'].label = 'Фамилия'
+        self.fields['last_name'].label = 'Имя'
 
     def clean_email(self):
         email = self.cleaned_data['email']
@@ -78,7 +79,45 @@ class RegistrationForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['username', 'password', 'confirm_password', 'first_name', 'last_name', 'address', 'phone', 'email']
+        fields = ['username', 'password', 'confirm_password', 'email', 'last_name', 'first_name', 'phone', 'address',]
+
+
+class CustomerForm(forms.ModelForm):
+
+    username = forms.CharField(required=True)
+    # required=False - не обязательное поле введа
+    phone = forms.CharField(required=False)
+    address = forms.CharField(required=False)
+    email = forms.EmailField()
+    first_name = forms.CharField()
+    last_name = forms.CharField()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].label = 'Логин'
+        self.fields['phone'].label = 'Номер телефона'
+        self.fields['address'].label = 'Адрес'
+        self.fields['email'].label = 'Почта'
+        self.fields['first_name'].label = 'Фамилия'
+        self.fields['last_name'].label = 'Имя'
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'last_name', 'first_name', 'phone', 'address',]
+
+
+# class ContactForm(forms.ModelForm):
+#     captcha = ReCaptchaField()
+#
+#     class Meta:
+#         model = Contact
+#         fields = ('email', 'captcha')
+#         widgets = {
+#             'email': forms.TextInput(attrs={'class': 'input'})
+#         }
+#         labels = {
+#             'email': ''
+#         }
 
 
 
@@ -160,13 +199,14 @@ class RegistrationForm(forms.ModelForm):
 #         fields = ['username', 'email', 'password', 'confirm_password', 'first_name', 'last_name', 'address', 'phone']
 # КОНЕЦ ВАЖНО
 
+
 # class UserEditForm(forms.ModelForm):
 #     class Meta:
-#         model = Customer
-#         fields = ['first_name', 'last_name', 'email']
+#         model = User
+#         fields = ['username', 'email', 'password', 'confirm_password', 'first_name', 'last_name', 'address', 'phone']
 #
 #
 # class CustomerEditForm(forms.ModelForm):
 #     class Meta:
 #         moder = Customer
-#         fields = ('address', 'phone')
+#         fields = ('email', 'password', 'confirm_password', 'first_name', 'last_name', 'address', 'phone')
