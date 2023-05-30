@@ -11,22 +11,35 @@
     <table class="table_cart">
         <thead>
             <tr>
+                <th>Изображение</th>
                 <th>Наименование товара</th>
                 <th>Цена</th>
                 <th>Количество</th>
-                <th>Общая цена</th>
+                <th>Общая цена в рублях</th>
             </tr>
         </thead>
         <tbody>
-            {% for item in cart.products.all %}
-                <tr>
-                    <th>{{ item.content_object.title }}</th>
-                    <th>{{ item.content_object.price }}</th>
-                    <th>{{ item.quantity }}</th>
-                    <th>{{ item.final_price }} рублей</th>
-                </tr>
+            {% for item in cart %}
+                {% with product=item.product %}
+                    <tr class="table_product_center">
+                        <td align="center">
+                            <a href='{{ product.get_absolute_url }}'>
+                                <img src="{{ product.image.url }}" width="200" height="200">
+                            </a>
+                        </td>
+                        <td align="center" >{{ product.title }}</td>
+                        <td align="center" >{{ product.price }}</td>
+                        <td align="center" >{{ item.quantity }}</td>
+                        <td align="center" >{{ item.total_price }}</td>
+                        <td align="center" ><a href="{% url 'cart_remove' product.id%}">Удалить</a></td>
+                    </tr>
+                {% endwith %}
             {% endfor %}
         </tbody>
     </table>
+
+    <div> 
+        <a href="{% url 'order_create' %}" ><button class="btn btn-dagner" id="add_to_cart_1">Оформить заказ</button></a>
+    </div>
 
 {% endblock %}

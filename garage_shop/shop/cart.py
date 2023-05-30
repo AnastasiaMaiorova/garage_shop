@@ -1,9 +1,9 @@
 from decimal import Decimal
 from django.conf import settings
-from .models import *
+from .models import Product
 
 
-class Carts(object):
+class Cart(object):
 
     # Иницилизация корзины
     def __init__(self, request):
@@ -45,6 +45,7 @@ class Carts(object):
         product_ids = self.cart.keys()
         # получение объектов product и добавление их в корзину
         products = Product.objects.filter(id__in=product_ids)
+        
         for product in products:
             self.cart[str(product.id)]['product'] = product
 

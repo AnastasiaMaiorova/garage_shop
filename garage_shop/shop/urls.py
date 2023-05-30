@@ -1,8 +1,8 @@
-from django.urls import path
+from django.urls import path, re_path
 from . import views
 
-from .views import ProductDetailView, CategoryDetailView, ShopDetailView, CartView, AddToCartView, AccountView
-from .views import AboutCompony
+from .views import ProductDetailView, CategoryDetailView, ShopDetailView, AddToCartView, AccountView
+from .views import AboutCompony, Delivery, AddressCompony
 
 urlpatterns = [
     # index
@@ -19,8 +19,13 @@ urlpatterns = [
     path('product/<str:slug>/', CategoryDetailView.as_view(), name='category_detail'),
     # path('product/oil/', views.oils, name='oils'),
     path('product/', ShopDetailView.as_view(), name='product'),
-    path('cart/', CartView.as_view(), name='cart'),
-    path('add-to-cart/<str:ct_model>/<str:slug>/', AddToCartView.as_view(), name='add_to_cart'),
-    path('about-compony/', AboutCompony.as_view(), name='about_compony')
+    path('cart/', views.cart_detail, name='cart_detail'),
+    re_path(r'^cart/add/(?P<product_id>\d+)/$', views.cart_add, name='cart_add'),
+    re_path(r'^cart/remove/(?P<product_id>\d+)/$', views.cart_remove, name='cart_remove'),
+    re_path(r'^create/$', views.order_create, name='order_create'),
+    # path('add-to-cart/<str:ct_model>/<str:slug>/', AddToCartView.as_view(), name='add_to_cart'),
+    path('about-compony/', AboutCompony.as_view(), name='about_compony'),
+    path('delivery/', Delivery.as_view(), name='delivery'),
+    path('address/', AddressCompony.as_view(), name='address_compony')
     # path('success/', views.success, name='success'),
 ]

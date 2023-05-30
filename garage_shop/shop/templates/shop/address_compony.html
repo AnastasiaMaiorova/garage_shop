@@ -1,0 +1,20 @@
+{% extends 'shop/index.html' %}
+{% block title %}Гараж - Доставка и оплата{% endblock %}
+{% block content %}
+{% load static %}
+
+<div>
+    <h3>Контакты</h3>
+    <h5>Адрес магазина</h5>
+    <div class="address_comppony">
+        <div>
+            <img src="{% static 'shop/image/address_compony.png' %}" alt="" width="600" height="400" >
+        </div>
+        <div>
+            <p>город Москва, Дмитровское шоссе, дом 67, стр. 5</p>
+            <p>телефон: +7 111 999 99 99</p>
+            <p>garage.magazine2023@gmail.com</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

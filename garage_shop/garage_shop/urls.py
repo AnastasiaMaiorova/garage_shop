@@ -25,7 +25,8 @@ from django.conf import settings
 urlpatterns = [
     # path('', default_urlconf),
     path('admin/', admin.site.urls),
-    path('', include('shop.urls'))
+    path('', include('shop.urls')),
+    path('mail/', include('send_email.urls'))
 ]
 
 if settings.DEBUG:

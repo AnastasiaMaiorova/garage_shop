@@ -1,13 +1,15 @@
+from typing import Any
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.views.decorators.http import require_POST
+from django.http import HttpRequest, HttpResponse
 from django.http import HttpResponseRedirect
 from django.contrib.contenttypes.models import ContentType
 from django import views
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from .forms import LoginForm, RegistrationForm, CustomerForm
+from .forms import LoginForm, RegistrationForm, CustomerForm, AddToCartForm, OrderCreateForm
 # CustomerEditForm, UserEditForm
-from .models import *
+from .models import CategoryManager, Customer, Category, Product, Oil, Filter, OrderItem, Order
 # from .models import Oil, Filter, Customer, Product, Category, Cart, ProductCart
 from django.views.generic import DetailView, View
 # from .mixins import CartMixin, NotificationsMixin
@@ -16,6 +18,7 @@ from .mixins import CategoryMixin, CategoryLeftMixin, ProductAvailableMixin
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
+from .cart import Cart
 
 
 
@@ -69,11 +72,19 @@ def info_shop(request):
 
 
 class ProductDetailView(CategoryLeftMixin, DetailView):
+    model = Product
+    context_object_name = 'product'
+    template_name = 'shop/product_detail.html'
+    slug_url_kwarg = 'slug'
 
     CT_MODEL_MODEL_CLASS = {
         'oil': Oil,
         'filter': Filter,
     }
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        # form = AddToCartForm()
+        return super().get(request, *args, **kwargs)
 
     # встроенная функция во view
     def dispatch(self, request, *args, **kwargs):
@@ -81,16 +92,12 @@ class ProductDetailView(CategoryLeftMixin, DetailView):
         self.queryset = self.model._base_manager.all()
         return super().dispatch(request, *args, **kwargs)
 
-    model = Product
-    context_object_name = 'product'
-    template_name = 'shop/product_detail.html'
-    slug_url_kwarg = 'slug'
 
 # шаблон где рандерится информация о товаре
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['ct_model'] = self.model._meta.model_name
-        # context['cart'] = self.cart
+        context['form'] = AddToCartForm()
         return context
 
 
@@ -247,28 +254,29 @@ def register(request):
 
 class AccountView(views.View):
     def get(self, request, *args, **kwargs):
-        # try:
-        user = User.objects.get(username=request.user)
-        customer = Customer.objects.get(user=request.user)
-        form = CustomerForm({
-            'username': user.username,
-            'email': user.email,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'phone': customer.phone,
-            'address': customer.address,
-            # 'password': '_',
-            # 'confirm_password': '_',
-        })
-        context = {
-            'user': user,
-            'customer': customer,
-            'form': form
-        }
-        return render(request, 'shop/account.html', context)
-        # except Exception as ex:
-        #     print(ex)
-        #     return redirect('login')
+        try:
+            user = User.objects.get(username=request.user)
+            customer = Customer.objects.get(user=request.user)
+            form = CustomerForm({
+                'username': user.username,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'phone': customer.phone,
+                'address': customer.address,
+                # 'password': '_',
+                # 'confirm_password': '_',
+            })
+            orders = Order.objects.filter(customer=customer)
+            context = {
+                'user': user,
+                'customer': customer,
+                'form': form,
+                'orders': orders
+            }
+            return render(request, 'shop/account.html', context)
+        except Exception as ex:
+            return redirect('login')
 
     def post(self, request, *args, **kwargs):
         user_form = CustomerForm(request.POST, instance=request.user)
@@ -397,20 +405,59 @@ class AddToCartView(View):
 
 
 
-class CartView(View):
+@require_POST
+def cart_add(request, product_id):
+    cart = Cart(request)
+    product = get_object_or_404(Product, id=product_id)
+    form = AddToCartForm(request.POST)
+    if form.is_valid():
+        cd = form.cleaned_data
+        cart.add(product=product,
+                 quantity=cd['quantity'],
+                 update_quantity=cd['update'])
+    return redirect('cart_detail')
 
-    def get(self, request, *args, **kwargs):
-        # customer = Customer.objects.get(user=request.user)
-        categories = Category.objects.all()
-        cart = Cart.objects.all()
-        context = {
-            # 'customer': customer,
-            'categories': categories,
-            'cart': cart
-        }
+def cart_remove(request, product_id):
+    cart = Cart(request)
+    product = get_object_or_404(Product, id=product_id)
+    cart.remove(product)
+    return redirect('cart_detail')
 
-        return render(request, 'shop/cart.html', context)
+def cart_detail(request):
+    cart = Cart(request)
+    return render(request, 'shop/cart.html', {'cart': cart})
 
+def order_create(request):
+    customer = Customer.objects.get(username=request.user)
+    cart = Cart(request)
+    if request.method == "POST":
+        form = OrderCreateForm(request.POST)
+        if form.is_valid():
+            order = form.save()
+            if customer is not None:
+                order.customer = customer
+            order.total_price = cart.get_total_price()
+            order.save()
+            for item in cart:
+                OrderItem.objects.create(order=order,
+                                         product=item['product'],
+                                         price=item['price'],
+                                         quantity=item['quantity'])
+            cart.clear()
+            return render(request, 'shop/order_created.html', {'order': order})
+    else:
+        if customer is not None:
+            form = OrderCreateForm({
+                'first_name': customer.first_name,
+                'last_name': customer.last_name,
+                'phone': customer.phone,
+                'address': customer.address,
+                # 'password': '_',
+                # 'confirm_password': '_',
+            })
+        else:
+            form = OrderCreateForm
+    return render(request, 'shop/order_create.html', {'cart': cart, 'form': form})
 
 # Выход из личного кабинета
 def custom_logout(request):
@@ -436,5 +483,25 @@ class AboutCompony(DetailView):
             'categories': categories
         }
         return render(request, 'shop/about_compony.html', context)
+
+
+class Delivery(DetailView):
+
+    def get(self, request, *args, **kwargs):
+        categories = Category.objects.all()
+        context = {
+            'categories': categories
+        }
+        return render(request, 'shop/delivery.html', context)
+
+
+class AddressCompony(DetailView):
+
+    def get(self, request, *args, **kwargs):
+        categories = Category.objects.all()
+        context = {
+            'categories': categories
+        }
+        return render(request, 'shop/address_compony.html', context)
 
 

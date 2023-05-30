@@ -1,7 +1,7 @@
 from typing import Any, Dict
 from django import forms
 from django.contrib.auth.models import User
-from .models import Contact
+from .models import Contact, Order
 # from snowpenguin.django.recaptcha3.fields import ReCaptchaField
 from .models import Customer
 
@@ -105,6 +105,17 @@ class CustomerForm(forms.ModelForm):
         model = User
         fields = ['username', 'email', 'last_name', 'first_name', 'phone', 'address',]
 
+
+PRODUCT_QUANTITY_CHOICES = [(i, str(i)) for i in range(1, 21)]
+class AddToCartForm(forms.Form):
+    quantity = forms.TypedChoiceField(choices=PRODUCT_QUANTITY_CHOICES, coerce=int, label='Количество')
+    update = forms.BooleanField(required=False, initial=False, widget=forms.HiddenInput)
+
+
+class OrderCreateForm(forms.ModelForm):
+    class Meta:
+        model = Order
+        fields = ["first_name", "last_name", "phone", "buying_type", "address", "comment"]
 
 # class ContactForm(forms.ModelForm):
 #     captcha = ReCaptchaField()

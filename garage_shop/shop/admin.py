@@ -35,8 +35,18 @@ class ContactAdmin(admin.ModelAdmin):
     list_display = ['email', 'date']
 
 
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
+    raw_id_fields = ['product']
+
+
+class OrderAdmin(admin.ModelAdmin):
+    inlines = [OrderItemInline]
+    list_filter = ['status', 'created_at']
+
+
 admin.site.register(Filter, FilterAdmin)
 admin.site.register(ProductCart)
 admin.site.register(Cart)
-admin.site.register(Order)
+admin.site.register(Order, OrderAdmin)
 admin.site.register(Notification)

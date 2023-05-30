@@ -9,22 +9,48 @@
             <form action="{% url 'account' %}" method="post">
                 {% csrf_token %}
                 {{ form.as_p }}
-                <p><input type="submit" value="Сохранить"></p>
+                <p><input type="submit" value="Сохранить" class="btn btn-success btn-block"></p>
             </form>
         {% else %}
-            Вы не авторизованы, перейдите по ссылке ниже для регистрации
+            Вы не авторизованы, перейдите в регистрацию
             <a class="nav-link" href="{% url 'login' %}"><img src=""><i class="fa fa-user-o"></i> Авторизация</a>
         {% endif %}
-        {% comment %} <form action="." method="post" enctype="multipart/form-data">
+
+        {% comment %}
+        <form action="." method="post" enctype="multipart/form-data">
             {{ user_form.as_p }}
             {{ profile_form.as_p }}
             {% csrf_token %}
-            <p><input type="submit" value="Сохранить"></p>
-        </form> {% endcomment %}
+            <p><input type="submit" value="Сохранить" class="account_submit"></p>
+        </form>
+        {% endcomment %}
+
 
     </div>
     <div class="order_user">
         <h1>Заказы</h1>
+
+        <table class="order_username">
+            <tr>
+                <th>Номер заказа</th>
+                <th>Дата заказа</th>
+                {% comment %}<th>Наименование товара</th>{% endcomment %}
+                <th>Сумма заказа</th>
+                <th>Статус заказа</th>
+                <th>Способ доставки</th>
+            </tr>
+            {% for order in orders %}
+            <tr>
+                <td>{{ order.id}}</td>
+                <td>{{ order.created_at}}</td>
+                {% comment %}<th>Наименование товара</th>{% endcomment %}
+                <td>{{ order.total_price}}</td>
+                <td>{{ order.status }}</td>
+                <td>{{ order.buying_type }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
     </div>
 </div>
 {% endblock %}

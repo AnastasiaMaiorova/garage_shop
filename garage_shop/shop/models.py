@@ -209,7 +209,7 @@ class Cart(models.Model):
 class Order(models.Model):
 
     # статус заказа
-    STATUS_NEW = 'new'
+    STATUS_NEW = 'Новый заказ'
     # добавить заказ отменен
     STATUS_CANCELLED = 'cancelled'
     # в процессе
@@ -236,17 +236,19 @@ class Order(models.Model):
         (BUYING_TYPE_DELIVERY, 'Доставка')
     )
 
-    customer = models.ForeignKey(Customer, verbose_name='Покупатель', related_name='orders', on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, verbose_name='Покупатель', related_name='orders', on_delete=models.CASCADE, blank=True, null=True)
     first_name = models.CharField(max_length=255, verbose_name='Имя')
     last_name = models.CharField(max_length=255, verbose_name='Фамилия')
     phone = models.CharField(max_length=20, verbose_name='Телефон')
-    cart = models.ForeignKey(Cart, verbose_name='Корзина', null=True, blank=True, on_delete=models.CASCADE)
+    # cart = models.ForeignKey(Cart, verbose_name='Корзина', null=True, blank=True, on_delete=models.CASCADE)
+
     address = models.CharField(max_length=1024, verbose_name='Адрес', null=True, blank=True)# null=True, blank=True - может быть пустой строкой
     status = models.CharField(max_length=100, verbose_name='Статус заказа', choices=STATUS_CHOICES, default=STATUS_NEW)
     buying_type = models.CharField(max_length=100, verbose_name='Тип заказа', choices=BUYING_TYPE_CHOICES)
     comment = models.TextField(verbose_name='Комментарий к заказу', null=True, blank=True)
     created_at = models.DateField(verbose_name='Дата создания заказа', auto_now=True)
-    order_date = models.DateField(verbose_name='Дата получения заказа', default=timezone.now)
+    order_date = models.DateField(verbose_name='Дата получения заказа', default=timezone.now, blank=True, null=True)
+    total_price = models.DecimalField(verbose_name='Сумма заказа', max_digits=10, decimal_places=2, blank=True, null=True)
 
     def __str__(self):
         return str(self.id)
@@ -254,6 +256,19 @@ class Order(models.Model):
     class Meta:
         verbose_name = 'Заказ'
         verbose_name_plural = 'Заказы'
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, related_name='order_items', on_delete=models.DO_NOTHING)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    quantity = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return '{}'.format(self.id)
+
+    def get_cost(self):
+        return self.price * self.quantity
 
 
 class NotificationManager(models.Manager):

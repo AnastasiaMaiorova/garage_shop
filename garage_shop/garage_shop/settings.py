@@ -34,7 +34,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    # 'send_email.apps.SendEmailConfig',
+    'send_email.apps.SendEmailConfig',
     'django_extensions',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -47,7 +47,7 @@ INSTALLED_APPS = [
 ]
 
 # AUTH_USER_MODEL = 'shop.Customer'
-# CART_SESSION_ID = 'shop'
+CART_SESSION_ID = 'cart'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -134,13 +134,14 @@ STATICFILES_DIRS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# EMAIL_USE_TLS = True
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_HOST_USER = os.environ['GMAIL_EMAIL']
-# EMAIL_HOST_PASSWORD = os.environ['GMAIL_PASSWORD']
-# DEFAULT_FROM_EMAIL = 'Garage shop'
-# DEFAULT_TO_EMAIL = 'garage.magazine2023@gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = "garage.magazine2023@gmail.com" # os.environ['GMAIL_EMAIL']
+EMAIL_HOST_PASSWORD = "" # os.environ['GMAIL_PASSWORD']
+DEFAULT_FROM_EMAIL = 'Garage shop'
+SERVER_EMAIL = 'garage.magazine2023@gmail.com'
+DEFAULT_TO_EMAIL = 'garage.magazine2023@gmail.com'
 
 
 # Default primary key field type

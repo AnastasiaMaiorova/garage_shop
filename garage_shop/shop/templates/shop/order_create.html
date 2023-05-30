@@ -1,0 +1,27 @@
+{% extends 'shop/index.html' %}
+{% block title %}Оформление заказа{% endblock %}
+{% block content %}
+
+<div class="checkout">
+    <h1>Оформление заказа</h1>
+    <ul>
+        {% for item in cart %}
+            <li>
+                {{ item.quantity }} x {{ item.product.title }} = 
+                <span> {{ item.total_price }} руб</span>
+            </li>
+        {% endfor %}
+    </ul>
+    <div>Итоговая сумма: {{ cart.get_total_price }} рублей</div>
+    <div class="account_user">
+        <form action="." method='post'>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <p><input type="submit" value="Оформить" class="btn btn-dagner" id="add_to_cart_1"></p>
+    </form>
+    </div>
+
+</div>
+
+
+{% endblock %}

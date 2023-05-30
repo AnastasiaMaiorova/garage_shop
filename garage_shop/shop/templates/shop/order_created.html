@@ -1,0 +1,14 @@
+{% extends 'shop/index.html' %}
+{% block title %}Успешно{% endblock %}
+{% block content %}
+
+<div class="checkout">
+    <h1>Спасибо за оформление заказа!</h1>
+    <div>
+        <p>Заказ усмешно сформирован.</p>
+        <p>Номер вашего заказа <b>{{ order.id }}.</b></p>
+    </div>
+</div>
+
+
+{% endblock %}
